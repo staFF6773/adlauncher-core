@@ -6,12 +6,24 @@ const { v4: uuidv4 } = require('uuid');
 
 class Launcher {
 
+  /**
+   * Crea un perfil en el directorio especificado si no existe ya.
+   * @param {string} root - La ruta raíz donde se debe crear el perfil.
+   */
   createProfile(root) {
+    // Verifica si el archivo 'launcher_profiles.json' no existe y lo crea.
     if(!fs.existsSync(path.join(root, 'launcher_profiles.json'))) {
       fs.writeFileSync(path.resolve(path.join(root, 'launcher_profiles.json')), JSON.stringify({ profiles: {}  }));
     }
   }
 
+  /**
+   * Encuentra archivos JAR en un directorio y sus subdirectorios.
+   * @param {string} directorio - Directorio a buscar.
+   * @param {string[]} files - Lista de archivos a encontrar.
+   * @param {string} ver - Versión de Minecraft.
+   * @returns {string} - Cadena con las rutas de los archivos JAR encontrados.
+   */
   encontrarArchivosJAR(directorio, files, ver) {
     const archivos = fs.readdirSync(directorio);
     let archivosJARString = '';
@@ -24,12 +36,10 @@ class Launcher {
         if(['1.14', '1.14.1', '1.14.2', '1.14.3'].includes(ver)) {
           if(path.extname(archivo) === '.jar' && files.includes(archivo)) {
             archivosJARString += rutaCompleta + ';';
-            // console.log(archivo)
           }
         } else {
           if (path.extname(archivo) === '.jar' && files.includes(archivo) && !archivo.includes('3.2.1')) {
             archivosJARString += rutaCompleta + ';';
-            // console.log(archivo)
           }
         }
       }
@@ -38,6 +48,12 @@ class Launcher {
     return archivosJARString;
   }
 
+  /**
+   * Autentica al usuario y devuelve su UUID.
+   * @param {string} root - Ruta raíz del juego.
+   * @param {string} us - Nombre de usuario.
+   * @returns {string} - UUID del usuario.
+   */
   auth(root, us) {
     try {
       const fil = JSON.parse(fs.readFileSync(path.join(root, 'usercache.json'), { encoding: 'utf-8'}))
@@ -48,6 +64,10 @@ class Launcher {
     }
   }
 
+  /**
+   * Inicia el juego con las opciones especificadas.
+   * @param {Object} options - Opciones para iniciar el juego.
+   */
   launch(options) {
     
     this.downloader = new downloader(this);
@@ -121,7 +141,6 @@ class Launcher {
       }
     }
 
-    // console.log(args)
     const spawnRoot = path.resolve(rootPath)
     const minecraft = spawn('java', args, { cwd: spawnRoot })
     console.log(`INICIANDO MINECRAFT VERSION: ${version}`);

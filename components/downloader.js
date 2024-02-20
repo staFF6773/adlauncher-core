@@ -4,18 +4,56 @@ let https = require('https');
 https.globalAgent.maxSockets = 2;
 const Zip = require('adm-zip');
 
+/**
+ * Clase para gestionar la descarga de archivos relacionados con Minecraft.
+ */
 class Downloader {
+  /**
+   * Crea una instancia de Downloader.
+   */
   constructor() {
+    /**
+     * URLs base utilizadas para la descarga de archivos.
+     * @type {Object}
+     */
     this.url = {
       meta: 'https://launchermeta.mojang.com/mc/game/version_manifest.json',
       resource: 'https://resources.download.minecraft.net',
     },
+    /**
+     * Directorio de caché para almacenar archivos temporales.
+     * @type {string}
+     */
     this.cache = 'cache',
+    /**
+     * Directorio para almacenar las versiones descargadas.
+     * @type {string}
+     */
     this.versions = 'versions',
+    /**
+     * Directorio para almacenar los recursos (assets) descargados.
+     * @type {string}
+     */
     this.assets = 'assets',
+    /**
+     * Directorio para almacenar las librerías descargadas.
+     * @type {string}
+     */
     this.libraries = 'libraries',
+    /**
+     * Directorio para almacenar los archivos nativos descargados.
+     * @type {string}
+     */
     this.natives = 'natives'
   }
+
+  /**
+   * Descarga un archivo desde una URL y lo guarda en un directorio especificado.
+   * @param {string} url La URL del archivo a descargar.
+   * @param {string} dir El directorio donde se guardará el archivo.
+   * @param {string} name El nombre con el que se guardará el archivo.
+   * @returns {Promise<string>} Una promesa que se resuelve con un mensaje de éxito cuando la descarga se completa.
+   */
   
   async down(url, dir, name) {
     try {
@@ -42,6 +80,11 @@ class Downloader {
     }
   }
 
+  /**
+   * Descarga el archivo de metadatos de una versión específica de Minecraft.
+   * @returns {Promise<string>} Una promesa que se resuelve con un mensaje de éxito cuando la descarga se completa.
+   */
+
   downloadVersion() {
     return new Promise(async (resolve, reject) => {
       if(!fs.existsSync(path.join(this.root, this.cache, 'json'))) fs.mkdirSync(path.join(this.root, this.cache, 'json'), { recursive: true })
@@ -63,6 +106,11 @@ class Downloader {
     })
   }
 
+  /**
+   * Descarga el cliente (archivo .jar) de una versión específica de Minecraft.
+   * @returns {Promise<string>} Una promesa que se resuelve con un mensaje de éxito cuando la descarga se completa.
+   */
+
   downloadClient() {
     return new Promise(async (resolve, reject) => {
       this.file = path.join(this.root, this.versions, this.version, `${this.version}.json`);
@@ -78,6 +126,11 @@ class Downloader {
       resolve(`CLIENTE DESCARGADO - ${this.version}.jar`);
     })
   }
+
+  /**
+   * Descarga los recursos (assets) de una versión específica de Minecraft.
+   * @returns {Promise<string>} Una promesa que se resuelve con un mensaje de éxito cuando la descarga se completa.
+   */
 
   downloadAssets() {
     return new Promise(async (resolve, reject) => {
@@ -107,6 +160,11 @@ class Downloader {
     })
   }
 
+  /**
+   * Descarga los archivos nativos de una versión específica de Minecraft.
+   * @returns {Promise<string>} Una promesa que se resuelve con un mensaje de éxito cuando la descarga se completa.
+   */
+
   downloadNatives() {
     return new Promise((resolve, reject) => {
       if(!fs.existsSync(path.join(this.root, this.natives))) fs.mkdirSync(path.join(this.root, this.natives));
@@ -131,6 +189,11 @@ class Downloader {
     })
   }
 
+  /**
+   * Descarga las librerías de una versión específica de Minecraft.
+   * @returns {Promise<string>} Una promesa que se resuelve con un mensaje de éxito cuando la descarga se completa.
+   */
+
   downloadLibraries() {
     return new Promise((resolve, reject) => {
       if(!fs.existsSync(path.join(this.root, this.libraries))) fs.mkdirSync(path.join(this.root, this.libraries));
@@ -152,6 +215,13 @@ class Downloader {
       resolve(`LIBRERÍAS DESCARGADAS - ${path.join(this.root, this.libraries)}`);
     })
   }
+
+  /**
+   * Descarga todos los archivos necesarios para una versión específica de Minecraft.
+   * @param {string} version La versión de Minecraft de la que se descargarán los archivos.
+   * @param {string} root El directorio raíz donde se guardarán los archivos descargados.
+   * @returns {Promise<string>} Una promesa que se resuelve con un mensaje de éxito cuando todas las descargas se completan.
+   */
 
   download(version, root) {
     this.version = version;
